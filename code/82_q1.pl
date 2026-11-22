@@ -65,6 +65,15 @@ clue(8, S) :-
     Dept == research,
     Lang \== javascript.
 
+% Clue 9 keeps one of the three solutions of clues 1 to 8. Two of them
+% differ only in names (the same department, language and project bundles
+% are swapped between friends), so a clue without names can only keep the
+% third one, where the AI project goes to the testing department.
+% CLUE 9: The friend who works in the testing department prefers the AI project.
+clue(9, S) :-
+    memberchk(p(_, testing, _, Project), S),
+    Project == 'AI'.
+
 % solve(+Active, -Solution):
 %   Solution is a complete assignment in which every friend has a different
 %   department, language and project, and every clue whose number is in

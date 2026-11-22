@@ -102,3 +102,18 @@ generate_equation(List, Equation) :-
     expr_to_string(RightTree, RStr),
     format(string(Str), '~s=~s', [LStr, RStr]),
     Equation = Str.
+
+% all_equations(+List, -Equations):
+%   Equations is the list of all valid equation strings for List, without
+%   duplicates and in standard order of terms (sort/2). It is [] when List
+%   has no valid equation.
+all_equations(List, Equations) :-
+    findall(E, generate_equation(List, E), Found),
+    sort(Found, Equations).
+
+% count_equations(+List, -N):
+%   N is the number of valid equations for List, i.e. the length of the
+%   list given by all_equations/2.
+count_equations(List, N) :-
+    all_equations(List, Equations),
+    length(Equations, N).

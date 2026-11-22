@@ -34,3 +34,27 @@
     (if (null? remaining)
         (my-reverse acc)
         (loop (cdr remaining) (cons (f (car remaining)) acc)))))
+
+;; (sublist? elem) -> boolean
+;; An element is a (sub)list when it is () or a pair. () counts as a list
+;; too, so nested empty lists are transformed instead of kept as atoms.
+(define (sublist? elem)
+  (or (null? elem) (pair? elem)))
+
+;; (insert-if-short x lst n) -> lst with x put at the front of every list,
+;; at every level of nesting (lst itself included), whose original
+;; top-level length is less than n
+;; The length of lst is measured first, on the original list. Then every
+;; element that is a list is transformed the same way (atoms are kept), and
+;; x is consed on afterwards if the original length was < n, so the new x
+;; is never measured or transformed itself.
+(define (insert-if-short x lst n)
+  (let ((len (my-length lst))
+        (transformed (my-map (lambda (elem)
+                               (if (sublist? elem)
+                                   (insert-if-short x elem n)
+                                   elem))
+                             lst)))
+    (if (< len n)
+        (cons x transformed)
+        transformed)))

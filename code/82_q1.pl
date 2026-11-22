@@ -10,6 +10,7 @@
 % findall/3 count one solution several times.
 
 :- use_module(library(lists)).
+:- use_module(library(aggregate)).
 
 % clue(+N, +Solution):
 %   Clue number N holds in the fully filled-in Solution.
@@ -80,6 +81,12 @@ solve(Active, Solution) :-
     permutation([python, java, 'c++', javascript],        [L1, L2, L3, L4]),
     permutation(['AI', web, embedded, data],              [P1, P2, P3, P4]),
     forall(member(C, Active), once(clue(C, Solution))).
+
+% count_solutions(+Active, -N):
+%   N is the number of complete assignments that satisfy every clue in
+%   Active and ignore all the other clues.
+count_solutions(Active, N) :-
+    aggregate_all(count, solve(Active, _), N).
 
 % main:
 %   Prints one solution of clues 1 to 8, one friend per line in the order

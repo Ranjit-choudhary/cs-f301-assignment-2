@@ -41,20 +41,31 @@
 (define (sublist? elem)
   (or (null? elem) (pair? elem)))
 
+;; (make-inserter x len-ok?) -> a function of one list
+;; The returned function puts x at the front of every list, at every level
+;; of nesting (its argument included), whose original top-level length
+;; satisfies len-ok?, a predicate on one number.
+;; For a list lst it first measures the length of lst (before any change),
+;; then transforms every element that is a list the same way (atoms are
+;; kept), and only then conses x on if len-ok? holds for that length, so
+;; the new x is never measured or transformed itself.
+(define (make-inserter x len-ok?)
+  (letrec ((insert
+            (lambda (lst)
+              (let ((len (my-length lst))
+                    (transformed (my-map (lambda (elem)
+                                           (if (sublist? elem)
+                                               (insert elem)
+                                               elem))
+                                         lst)))
+                (if (len-ok? len)
+                    (cons x transformed)
+                    transformed)))))
+    insert))
+
 ;; (insert-if-short x lst n) -> lst with x put at the front of every list,
 ;; at every level of nesting (lst itself included), whose original
 ;; top-level length is less than n
-;; The length of lst is measured first, on the original list. Then every
-;; element that is a list is transformed the same way (atoms are kept), and
-;; x is consed on afterwards if the original length was < n, so the new x
-;; is never measured or transformed itself.
+;; It is the inserter for x whose length test is "less than n".
 (define (insert-if-short x lst n)
-  (let ((len (my-length lst))
-        (transformed (my-map (lambda (elem)
-                               (if (sublist? elem)
-                                   (insert-if-short x elem n)
-                                   elem))
-                             lst)))
-    (if (< len n)
-        (cons x transformed)
-        transformed)))
+  ((make-inserter x (lambda (len) (< len n))) lst))

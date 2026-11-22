@@ -63,3 +63,33 @@ clue(8, S) :-
     memberchk(p(_, Dept, Lang, data), S),
     Dept == research,
     Lang \== javascript.
+
+% solve(+Active, -Solution):
+%   Solution is a complete assignment in which every friend has a different
+%   department, language and project, and every clue whose number is in
+%   Active holds. The assignment is generated first, so clue/2 only ever
+%   sees a fully instantiated Solution. Each clue is checked once inside
+%   forall/2, so the check adds no choicepoints and repeated clue numbers
+%   in Active cannot produce the same Solution twice.
+solve(Active, Solution) :-
+    Solution = [p('Alex',  D1, L1, P1),
+                p('Ben',   D2, L2, P2),
+                p('Carla', D3, L3, P3),
+                p('Dana',  D4, L4, P4)],
+    permutation([research, development, design, testing], [D1, D2, D3, D4]),
+    permutation([python, java, 'c++', javascript],        [L1, L2, L3, L4]),
+    permutation(['AI', web, embedded, data],              [P1, P2, P3, P4]),
+    forall(member(C, Active), once(clue(C, Solution))).
+
+% main:
+%   Prints one solution of clues 1 to 8, one friend per line in the order
+%   Alex, Ben, Carla, Dana, as  Name = [Dept, Lang, Project].
+main :-
+    once(solve([1, 2, 3, 4, 5, 6, 7, 8], Solution)),
+    print_solution(Solution).
+
+% print_solution(+Solution):
+%   Prints each p(Name, Dept, Lang, Project) of Solution on its own line.
+print_solution(Solution) :-
+    forall(member(p(Name, Dept, Lang, Project), Solution),
+           format('~w = [~w, ~w, ~w]~n', [Name, Dept, Lang, Project])).

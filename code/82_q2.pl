@@ -85,3 +85,20 @@ needs_parens(left, ParentPrec, op(Op, _, _)) :-
 needs_parens(right, ParentPrec, op(Op, _, _)) :-
     precedence(Op, P),
     P =< ParentPrec.
+
+% generate_equation(+List, ?Equation):
+%   Equation is the canonical string "L=R" of a valid equation over List:
+%   List is split into a non-empty left and right part (in order), L is an
+%   expression over the left part, R is an expression over the right part,
+%   and both have the same exact integer value. Backtracking gives every
+%   valid equation once. Fails for [], for one-element lists and for lists
+%   with no valid equation.
+generate_equation(List, Equation) :-
+    split_list(List, LeftNums, RightNums),
+    build_expr(LeftNums, LeftTree, Val),
+    build_expr(RightNums, RightTree, RightVal),
+    RightVal =:= Val,
+    expr_to_string(LeftTree, LStr),
+    expr_to_string(RightTree, RStr),
+    format(string(Str), '~s=~s', [LStr, RStr]),
+    Equation = Str.

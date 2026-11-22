@@ -83,3 +83,23 @@
       (postorder-acc (node-left tree)
                      (postorder-acc (node-right tree)
                                     (cons (node-value tree) acc)))))
+
+;; ---------------------------------------------------------------------
+;; Printing
+;; ---------------------------------------------------------------------
+
+;; (print-line x) -> prints x with display, then a newline
+(define (print-line x)
+  (display x)
+  (newline))
+
+;; (print-inorder tree) -> prints the inorder list of tree on one line
+(define (print-inorder tree)
+  (print-line (inorder-list tree)))
+
+;; (print-all-traversals tree) -> prints three lines: the inorder,
+;; preorder and postorder lists of tree, in that order
+(define (print-all-traversals tree)
+  (print-line (inorder-list tree))
+  (print-line (preorder-list tree))
+  (print-line (postorder-list tree)))

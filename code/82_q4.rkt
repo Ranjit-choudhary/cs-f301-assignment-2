@@ -69,3 +69,14 @@
 ;; It is the inserter for x whose length test is "less than n".
 (define (insert-if-short x lst n)
   ((make-inserter x (lambda (len) (< len n))) lst))
+
+;; (print-insert-result) -> reads x, lst and n from standard input, in that
+;; order, and prints (insert-if-short x lst n) followed by a newline
+;; let* binds one name at a time, so the three reads happen strictly left
+;; to right. Nothing else is printed: no prompt and no extra text.
+(define (print-insert-result)
+  (let* ((x (read))
+         (lst (read))
+         (n (read)))
+    (display (insert-if-short x lst n))
+    (newline)))

@@ -1,3 +1,11 @@
+**Group 82** (CS F301 — Assignment 2)
+
+Members:
+- Ranjit Choudhary (2023B1A71226H)
+- Rishabh Singh (2023B4A70721H)
+- Ritwik Sethi (2023B1A71385H)
+- Arihant Rakhecha (2023B1A70998H)
+
 # P1 Report: Department Assignment Puzzle
 
 ## Value of N

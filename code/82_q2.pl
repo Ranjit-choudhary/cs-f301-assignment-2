@@ -42,3 +42,46 @@ apply_op(/, L, R, V) :-
     R =\= 0,
     0 =:= L rem R,
     V is L // R.
+
+% precedence(?Op, ?Prec):
+%   Prec is the binding strength of Op; * and / bind tighter than + and -.
+precedence(+, 1).
+precedence(-, 1).
+precedence(*, 2).
+precedence(/, 2).
+
+% expr_to_string(+Expr, -Str):
+%   Str is the canonical SWI-Prolog string of Expr, with no spaces.
+%   A number is written in decimal. An op(Op, L, R) is written as L, Op, R,
+%   where each operand is put in parentheses by needs_parens/3, so every
+%   different tree gets a different string.
+expr_to_string(num(N), Str) :-
+    number_string(N, Str).
+expr_to_string(op(Op, L, R), Str) :-
+    precedence(Op, P),
+    operand_string(left, P, L, LStr),
+    operand_string(right, P, R, RStr),
+    format(string(Str), "~w~w~w", [LStr, Op, RStr]).
+
+% operand_string(+Side, +ParentPrec, +Expr, -Str):
+%   Str is Expr written as the Side operand of an operator of precedence
+%   ParentPrec: in parentheses when needs_parens/3 says so, plain otherwise.
+operand_string(Side, ParentPrec, Expr, Str) :-
+    expr_to_string(Expr, Inner),
+    (   needs_parens(Side, ParentPrec, Expr)
+    ->  format(string(Str), "(~w)", [Inner])
+    ;   Str = Inner
+    ).
+
+% needs_parens(+Side, +ParentPrec, +Expr):
+%   Expr must be in parentheses as the Side operand of a parent of
+%   precedence ParentPrec. A number never needs them. A left operand needs
+%   them only if its operator binds strictly weaker than the parent (the
+%   operators are left-associative); a right operand needs them if its
+%   operator binds the same or weaker.
+needs_parens(left, ParentPrec, op(Op, _, _)) :-
+    precedence(Op, P),
+    P < ParentPrec.
+needs_parens(right, ParentPrec, op(Op, _, _)) :-
+    precedence(Op, P),
+    P =< ParentPrec.
